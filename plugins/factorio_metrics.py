@@ -9,7 +9,7 @@ from common_lib import BaseStat  # pylint: disable=no-name-in-module
 
 
 class FactorioStats(BaseStat):
-    """Dummy user module"""
+    """Factorio metrics: playercount logged every second for each server provided"""
     name = "Factorio"
     def __init__(self):
         self.out_data = {"measurement": "factorio"}
@@ -41,7 +41,7 @@ class FactorioStats(BaseStat):
                 LOGGER.warning("Connection to {0} rejected".format(key))
 
     async def get_stats(self):
-        """Dummy get stats function"""
+        """Fetches playercount"""
         self.out_data = {"measurement": "factorio"}
         for key, value in self.connections.items():
             try:
