@@ -70,6 +70,7 @@ class RCONConnection(BaseStat):
                 message = "Reconnect"
             LOGGER.log(self.info_level, "{0} to {1} successful".format(message, self.name))
             self.reconnect_failures = 0
+            self.last_connect_attempt_time = 0
 
     async def fetch_queries(self, queries):
         """Peforms the queries requested"""
@@ -83,7 +84,10 @@ class RCONConnection(BaseStat):
                            "({1}s since last successful connection)"
                            .format(self.name, self.time_down()))
                 await self.connect()
-            return
+                if self.rcon_client is None:
+                    return
+            else:
+                return
         results = None
         with trio.move_on_after(0.5):
             try:
@@ -116,7 +120,7 @@ class RCONConnection(BaseStat):
                     time_delta = response_time - self.persistent["ups"][0]
                     tick_delta = response - self.persistent["ups"][1]
                     self.persistent["ups"] = [response_time, response]
-                    if tick_delta >= 0: # check ticks have increased is positive
+                    if tick_delta >= 0: # check the number of ticks passed has increased
                         results["ups"] = tick_delta / time_delta
                     elif response < 7200: # 7200 ticks which is 120s at 60UPS
                         LOGGER.log(self.info_level, "New map started on {0}".format(self.name))
