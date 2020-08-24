@@ -49,7 +49,7 @@ class RCONConnection(BaseStat):
 
     def time_down(self):
         """Calculates the time that the server has been down"""
-        return self.reconnect_failures * self.save_rate
+        return self.reconnect_failures * self.collect_interval
 
     async def connect(self, initial=False):
         """Connects to the RCON server"""
@@ -141,9 +141,8 @@ class FactorioStats(BaseStat):
             RCONConnection("server_2", "127.0.0.1", 12346, "my_password", level=logging.DEBUG)
         ]
         self.queries = dict(player_count="/p o c", tick="/silent-command rcon.print(game.tick)")
-        trio.run(self.initial_connect)
 
-    async def initial_connect(self):
+    async def async_init(self):
         """Connects to all the RCON servers at once"""
         async with trio.open_nursery() as nursery:
             for connection in self.connections:
